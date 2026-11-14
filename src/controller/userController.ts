@@ -29,13 +29,15 @@ export const registerFunc = async (req: Request, res: Response) => {
 
     const usersCount = await userModel.countDocuments();
 
-    res.cookie("auth_token", token, {
-      httpOnly: true,
-      maxAge: 1000 * 60 * 60 * 24 * 7,
-      sameSite: "strict",
-      path: "/",
-      secure: process.env.NODE_ENV === "production",
-    });
+    res.cookie("auth_token", token,
+      {
+  httpOnly: true,
+  maxAge: 1000 * 60 * 60 * 24 * 7,
+  sameSite: "none" as const,
+  secure: true,
+  path: "/",
+}
+    );
 
     await userModel.create({
       name,
@@ -94,12 +96,12 @@ export const loginFunc = async (req: Request, res: Response) => {
     const token = tokenGenerator(email);
 
     res.cookie("auth_token", token, {
-      httpOnly: true,
-      maxAge: 1000 * 60 * 60 * 24 * 7,
-      sameSite: "strict",
-      path: "/",
-      secure: process.env.NODE_ENV === "production",
-    });
+  httpOnly: true,
+  maxAge: 1000 * 60 * 60 * 24 * 7,
+  sameSite: "none" as const,
+  secure: true,
+  path: "/",
+});
 
     res.json({
       success: true,
