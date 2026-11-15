@@ -75,7 +75,7 @@ export const loginFunc = async (req: Request, res: Response) => {
       });
     }
 
-    if(findUser.isBan) {
+    if (findUser.isBan) {
       return res.status(403).json({
         success: false,
         title: "کاربر بن شده",
@@ -96,12 +96,12 @@ export const loginFunc = async (req: Request, res: Response) => {
     const token = tokenGenerator(email);
 
     res.cookie("auth_token", token, {
-  httpOnly: true,
-  maxAge: 1000 * 60 * 60 * 24 * 7,
-  sameSite: "none" as const,
-  secure: true,
-  path: "/",
-});
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 24 * 7,
+      sameSite: "none" as const,
+      secure: true,
+      path: "/",
+    });
 
     res.json({
       success: true,
