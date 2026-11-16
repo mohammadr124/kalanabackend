@@ -140,7 +140,7 @@ export const getmeFunc = async (req: Request, res: Response) => {
     const tokenInfo: string | JwtPayload | undefined | any =
       verifyToken(authToken);
     const email = tokenInfo.email;
-    const findUser = await userModel.findOne({ email } as any, "-__v ");
+    const findUser = await userModel.findOne({ email } as any, "-__v  -password");
 
     if (findUser.isBan) {
       return res.status(403).json({
