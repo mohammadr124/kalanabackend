@@ -120,7 +120,7 @@ export const logoutFunc = (req: Request, res: Response) => {
   const token = tokenGenerator("testEmail");
   res.cookie("auth_token", token, {
     httpOnly: true,
-    maxAge: 1000 * 60 * 60 * 24 * 7,
+    maxAge: 0,
     sameSite: "none" as const,
     secure: true,
     path: "/",
