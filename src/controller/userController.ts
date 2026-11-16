@@ -73,7 +73,7 @@ export const loginFunc = async (req: Request, res: Response) => {
       });
     }
 
-    if (findUser.isBan) {
+    if (findUser?.isBan) {
       return res.status(403).json({
         success: false,
         title: "کاربر بن شده",
