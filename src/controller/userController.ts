@@ -29,15 +29,13 @@ export const registerFunc = async (req: Request, res: Response) => {
 
     const usersCount = await userModel.countDocuments();
 
-    res.cookie("auth_token", token,
-      {
-  httpOnly: true,
-  maxAge: 1000 * 60 * 60 * 24 * 7,
-  sameSite: "none" as const,
-  secure: true,
-  path: "/",
-}
-    );
+    res.cookie("auth_token", token, {
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 24 * 7,
+      sameSite: "none" as const,
+      secure: true,
+      path: "/",
+    });
 
     await userModel.create({
       name,
@@ -122,8 +120,9 @@ export const logoutFunc = (req: Request, res: Response) => {
   const token = tokenGenerator("testEmail");
   res.cookie("auth_token", token, {
     httpOnly: true,
-    maxAge: 0,
-    sameSite: "strict",
+    maxAge: 1000 * 60 * 60 * 24 * 7,
+    sameSite: "none" as const,
+    secure: true,
     path: "/",
   });
 
@@ -143,7 +142,7 @@ export const getmeFunc = async (req: Request, res: Response) => {
     const email = tokenInfo.email;
     const findUser = await userModel.findOne({ email } as any, "-__v ");
 
-    if(findUser.isBan) {
+    if (findUser.isBan) {
       return res.status(403).json({
         success: false,
         title: "کاربر بن شده",
@@ -179,10 +178,9 @@ export const changePassword = async (req: Request, res: Response) => {
 
     const newPassword = await hashPassword(password);
 
-    const user = await userModel.findOne(
-      { phone } as any,)
+    const user = await userModel.findOne({ phone } as any);
 
-    if(user.isBan) {
+    if (user.isBan) {
       return res.status(403).json({
         success: false,
         title: "کاربر بن شده",
@@ -241,12 +239,13 @@ export const allUserFunc = async (req: Request, res: Response) => {
       .skip(skip)
       .sort({ createdAt: -1 });
 
-    const [banUserCount, activeUserCount, adminsCount, userCount] = await Promise.all([
-      userModel.countDocuments({ isBan: true }),
-      userModel.countDocuments({ isBan: false }),
-      userModel.countDocuments({ role: "ADMIN" }),
-      userModel.countDocuments({}),
-    ]);
+    const [banUserCount, activeUserCount, adminsCount, userCount] =
+      await Promise.all([
+        userModel.countDocuments({ isBan: true }),
+        userModel.countDocuments({ isBan: false }),
+        userModel.countDocuments({ role: "ADMIN" }),
+        userModel.countDocuments({}),
+      ]);
 
     return res.json({
       success: true,
@@ -257,7 +256,7 @@ export const allUserFunc = async (req: Request, res: Response) => {
         banUserCount,
         activeUserCount,
         adminsCount,
-        userCount
+        userCount,
       },
     });
   } catch (err) {
@@ -270,8 +269,8 @@ export const allUserFunc = async (req: Request, res: Response) => {
   }
 };
 
-export const banUser =  async (req: Request, res: Response) => {
-  await connectToDb() 
+export const banUser = async (req: Request, res: Response) => {
+  await connectToDb();
   try {
     const { id } = req.params;
 
@@ -293,7 +292,7 @@ export const banUser =  async (req: Request, res: Response) => {
       });
     }
 
-    if(user.role === "ADMIN") {
+    if (user.role === "ADMIN") {
       return res.status(403).json({
         success: true,
         title: "درخواست نامعتبر",
@@ -320,7 +319,6 @@ export const banUser =  async (req: Request, res: Response) => {
       title: "عملیات موفقبت آمیز",
       messages: "اطلاعات کاربر با موفقیت بروز  رسانی شد",
     });
-
   } catch (err) {
     console.log("error in ban  user API =====> ", err);
     return res.status(500).json({
@@ -329,13 +327,13 @@ export const banUser =  async (req: Request, res: Response) => {
       messages: "سرور به مشکل مدتی بعد مجددا تلاش نمایید",
     });
   }
-}
+};
 
 export const createAdminUser = async (req: Request, res: Response) => {
-  await connectToDb()
+  await connectToDb();
   try {
-    const { id } = req.params 
-    if(!id || !isValidObjectId(id)) {
+    const { id } = req.params;
+    if (!id || !isValidObjectId(id)) {
       return res.status(400).json({
         success: false,
         title: "اطلاعات نا معتبر",
@@ -343,8 +341,8 @@ export const createAdminUser = async (req: Request, res: Response) => {
       });
     }
 
-    const user = await userModel.findOne({_id: id} as any)
-    const role = user.role
+    const user = await userModel.findOne({ _id: id } as any);
+    const role = user.role;
 
     if (role === "ADMIN") {
       return res.status(403).json({
@@ -367,17 +365,17 @@ export const createAdminUser = async (req: Request, res: Response) => {
       message: "اطلاعات کاربر مورد نطر با موفقیت بروزرسانی شد",
     });
   } catch (err) {
-    console.log("error in create admin api ====>", err);  
+    console.log("error in create admin api ====>", err);
     return res.status(500).json({
       success: false,
       title: "خطای داخلی سرور",
       messages: "سرور به مشکل مدتی بعد مجددا تلاش نمایید",
     });
   }
-}
+};
 
-export const updateInfoFunc =  async (req: Request, res: Response) => {
-  await connectToDb() 
+export const updateInfoFunc = async (req: Request, res: Response) => {
+  await connectToDb();
   try {
     const { name, lastName, email } = req.body;
     const authToken = req.cookies.auth_token;
@@ -444,4 +442,4 @@ export const updateInfoFunc =  async (req: Request, res: Response) => {
       messages: "سرور به مشکل مدتی بعد مجددا تلاش نمایید",
     });
   }
-}
+};
